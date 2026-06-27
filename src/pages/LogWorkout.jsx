@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { db } from '../db'
 import ExercisePicker from '../components/ExercisePicker'
 import SetEditor from '../components/SetEditor'
+import WorkoutSummary from '../components/WorkoutSummary'
 
 const DEFAULT_SETS = [
   { weight: '', reps: '' },
@@ -53,9 +54,15 @@ export default function LogWorkout() {
       }))
     )
 
-    setStage('pick')
     setExercise(null)
     setSets([...DEFAULT_SETS.map(s => ({ ...s }))])
+    setStage('saved')
+  }
+
+  function handleDone() {
+    setStage('start')
+    setWorkoutId(null)
+    setDate(todayISO())
   }
 
   if (stage === 'start') {
@@ -98,5 +105,29 @@ export default function LogWorkout() {
         </button>
       </div>
     )
+  }
+
+  if (stage === 'saved') {
+    return (
+      <div className="p-4 flex flex-col gap-4">
+        <p className="text-green-600 font-medium">Exercise saved!</p>
+        <button
+          onClick={() => setStage('pick')}
+          className="bg-blue-600 text-white rounded-xl min-h-[52px] text-base font-semibold"
+        >
+          Next Exercise
+        </button>
+        <button
+          onClick={() => setStage('summary')}
+          className="bg-gray-800 text-white rounded-xl min-h-[52px] text-base font-semibold"
+        >
+          Finish Workout
+        </button>
+      </div>
+    )
+  }
+
+  if (stage === 'summary') {
+    return <WorkoutSummary workoutId={workoutId} onDone={handleDone} />
   }
 }
