@@ -3,6 +3,7 @@ import { db } from '../db'
 import ExercisePicker from '../components/ExercisePicker'
 import SetEditor from '../components/SetEditor'
 import WorkoutSummary from '../components/WorkoutSummary'
+import { getLastSetsForExercise } from '../lib/queries'
 
 const DEFAULT_SETS = [
   { weight: '', reps: '' },
@@ -27,9 +28,10 @@ export default function LogWorkout() {
     setStage('pick')
   }
 
-  function handleSelectExercise(ex) {
+  async function handleSelectExercise(ex) {
     setExercise(ex)
-    setSets([...DEFAULT_SETS.map(s => ({ ...s }))])
+    const lastSets = await getLastSetsForExercise(ex.id)
+    setSets(lastSets ?? DEFAULT_SETS.map(s => ({ ...s })))
     setStage('log')
   }
 
