@@ -35,9 +35,12 @@ export default function WorkoutDetail() {
 
   return (
     <div className="p-4 flex flex-col gap-6">
-      <div className="flex items-center gap-3">
-        <Link to="/history" className="text-blue-600 text-sm">← Back</Link>
-        <h1 className="text-2xl font-bold">{workout.date}</h1>
+      <div className="flex items-start gap-3">
+        <Link to="/history" className="text-blue-600 text-sm mt-1">← Back</Link>
+        <div>
+          <h1 className="text-2xl font-bold">{workout.title || workout.date}</h1>
+          {workout.title ? <p className="text-sm text-gray-400">{workout.date}</p> : null}
+        </div>
       </div>
 
       {entries.map(({ exercise, sets }, i) => (

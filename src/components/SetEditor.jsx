@@ -1,8 +1,18 @@
-const DEFAULT_SET = { weight: '', reps: '' }
+const DEFAULT_SET = { weight: '', reps: '', done: false }
 
-export default function SetEditor({ sets, onChange }) {
+function weightLabel(exerciseName) {
+  if (exerciseName?.toLowerCase().includes('dumbbell')) return 'DB weight (lbs)'
+  return 'Weight (lbs)'
+}
+
+export default function SetEditor({ sets, onChange, exerciseName }) {
   function updateSet(index, field, value) {
     const next = sets.map((s, i) => i === index ? { ...s, [field]: value } : s)
+    onChange(next)
+  }
+
+  function toggleDone(index) {
+    const next = sets.map((s, i) => i === index ? { ...s, done: !s.done } : s)
     onChange(next)
   }
 
@@ -17,14 +27,28 @@ export default function SetEditor({ sets, onChange }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-[1fr_1fr_44px] gap-2 text-sm font-medium text-gray-500 px-1">
-        <span>Weight (lbs)</span>
+      <div className="grid grid-cols-[44px_1fr_1fr_44px] gap-2 text-sm font-medium text-gray-500 px-1">
+        <span />
+        <span>{weightLabel(exerciseName)}</span>
         <span>Reps</span>
         <span />
       </div>
 
       {sets.map((s, i) => (
-        <div key={i} className="grid grid-cols-[1fr_1fr_44px] gap-2 items-center">
+        <div
+          key={i}
+          className={`grid grid-cols-[44px_1fr_1fr_44px] gap-2 items-center transition-opacity ${s.done ? 'opacity-50' : ''}`}
+        >
+          <button
+            onClick={() => toggleDone(i)}
+            className={`min-h-[44px] min-w-[44px] rounded-full border-2 flex items-center justify-center text-lg transition-colors ${
+              s.done
+                ? 'bg-green-500 border-green-500 text-white'
+                : 'border-gray-300 text-transparent'
+            }`}
+          >
+            ✓
+          </button>
           <input
             type="number"
             inputMode="numeric"

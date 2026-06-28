@@ -24,7 +24,7 @@ export async function getLastSetsForExercise(exerciseId) {
     .where('entryId').equals(lastEntry.id)
     .toArray()
 
-  return sets.map(s => ({ weight: String(s.weight), reps: String(s.reps) }))
+  return sets.map(s => ({ weight: String(s.weight), reps: String(s.reps), done: false }))
 }
 
 export async function buildChartData(exerciseId) {

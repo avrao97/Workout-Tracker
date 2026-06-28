@@ -6,9 +6,9 @@ import WorkoutSummary from '../components/WorkoutSummary'
 import { getLastSetsForExercise } from '../lib/queries'
 
 const DEFAULT_SETS = [
-  { weight: '', reps: '' },
-  { weight: '', reps: '' },
-  { weight: '', reps: '' },
+  { weight: '', reps: '', done: false },
+  { weight: '', reps: '', done: false },
+  { weight: '', reps: '', done: false },
 ]
 
 function todayISO() {
@@ -18,12 +18,13 @@ function todayISO() {
 export default function LogWorkout() {
   const [stage, setStage] = useState('start')
   const [date, setDate] = useState(todayISO)
+  const [title, setTitle] = useState('')
   const [workoutId, setWorkoutId] = useState(null)
   const [exercise, setExercise] = useState(null)
   const [sets, setSets] = useState(DEFAULT_SETS)
 
   async function handleStart() {
-    const id = await db.workouts.add({ date })
+    const id = await db.workouts.add({ date, title: title.trim() })
     setWorkoutId(id)
     setStage('pick')
   }
@@ -36,7 +37,7 @@ export default function LogWorkout() {
   }
 
   async function handleSave() {
-    const validSets = sets.filter(s => s.reps !== '' && s.reps !== '0')
+    const validSets = sets.filter(s => s.done && s.reps !== '')
     if (validSets.length === 0) return
 
     const entryCount = await db.entries
@@ -65,6 +66,7 @@ export default function LogWorkout() {
     setStage('start')
     setWorkoutId(null)
     setDate(todayISO())
+    setTitle('')
   }
 
   if (stage === 'start') {
@@ -77,6 +79,16 @@ export default function LogWorkout() {
             type="date"
             value={date}
             onChange={e => setDate(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 min-h-[44px] text-base"
+          />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-600">Title <span className="text-gray-400 font-normal">(optional)</span></label>
+          <input
+            type="text"
+            placeholder="e.g. Full Body at EoS - 9AM"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
             className="border border-gray-300 rounded-lg px-3 min-h-[44px] text-base"
           />
         </div>
@@ -98,7 +110,7 @@ export default function LogWorkout() {
     return (
       <div className="p-4 flex flex-col gap-6">
         <h1 className="text-2xl font-bold">{exercise.name}</h1>
-        <SetEditor sets={sets} onChange={setSets} />
+        <SetEditor sets={sets} onChange={setSets} exerciseName={exercise.name} />
         <button
           onClick={handleSave}
           className="bg-blue-600 text-white rounded-xl min-h-[52px] text-base font-semibold"
